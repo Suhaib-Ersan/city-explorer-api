@@ -10,7 +10,7 @@ function moviesJS(req, res) {
 
   if (recentHitsInMemory[searchQuery] !== undefined) {
     console.log(`In movies.js, the request of ${searchQuery}'s data is in memory`);
-    response.status(200).send(recentHitsInMemory[searchQuery]);
+    res.status(200).send(recentHitsInMemory[searchQuery]);
   } else {
     let moviesUrl = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.THEMOVIEDB_API_KEY}&query=${searchQuery}`;
 

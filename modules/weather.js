@@ -13,7 +13,7 @@ function weatherJS(req, res) {
 
   if (recentHitsInMemory[cityNameInQ] !== undefined) {
     console.log(`In weather.js, the request of ${cityNameInQ}'s data is in memory`);
-    response.status(200).send(recentHitsInMemory[cityNameInQ]);
+    res.status(200).send(recentHitsInMemory[cityNameInQ]);
   } else {
     let weatherUrl = `https://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&city=${cityNameInQ}&days=5`;
    
