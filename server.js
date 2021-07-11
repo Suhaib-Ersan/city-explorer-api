@@ -19,7 +19,7 @@ server.use(cors());
 // localhost:3001/cities?cityName=amman
 server.get("/cities", weatherJS);
 
-// localhost:3001/movies?cityName=amman
+// localhost:3001/movies?searchQuery=amman
 server.get("/movies", moviesJS);
 
 
