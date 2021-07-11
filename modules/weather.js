@@ -1,37 +1,38 @@
 "use strict";
 
-const { default: axios } = require("axios");
+const axios = require("axios");
 let recentHitsInMemory = {};
 
-const weatherData = require("../data/weather.json");
-const moviesJS = require("./movies");
+// const weatherData = require("../data/weather.json");
 
 // https://api.weatherbit.io/v2.0/v2.0/forecast/daily?key=key&city=amman&days=5
+// localhost:3001/cities?cityName=amman
+function weatherJS(req, res) {
+  let cityNameInQ = req.query.cityName;
+  // console.log(`cityNameInQ = `, cityNameInQ);
 
-const weatherJS = async (req, res) => {
-  try {
-    if (recentHitsInMemory[req.query.cityName] !== undefined) {
-      console.log(`the request of ${req.query.cityName}'s data is in memory`);
-      response.status(200).send(recentHitsInMemory[req.query.cityName]);
-    } else {
-      let weatherUrl = `https://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&city=${req.query.cityName}&days=5`;
+  if (recentHitsInMemory[cityNameInQ] !== undefined) {
+    console.log(`In weather.js, the request of ${cityNameInQ}'s data is in memory`);
+    response.status(200).send(recentHitsInMemory[cityNameInQ]);
+  } else {
+    let weatherUrl = `https://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.WEATHER_API_KEY}&city=${cityNameInQ}&days=5`;
+   
 
-      let weatherGet = await axios.get(weatherUrl);
-      // weatherGet = weatherData;
-      // console.log(`weatherGet !== undefined`,weatherGet !== undefined);
-      // console.log(`weatherGet.data.data !== undefined`, weatherGet.data.data !== undefined);
-
-      let cityWeatherData = weatherGet.data.data.map((day) => {
-        return new CityWeather(day.description, day.weather.description);
+    axios
+      .get(weatherUrl)
+      .then((weatherGet) => {
+        let weaArr = weatherGet.data.data.map((day, idx) => {
+          return new CityWeather(day);
+        });
+        // console.log("weaArr ", weaArr);
+        recentHitsInMemory[cityNameInQ] = weaArr;
+        res.status(200).send(weaArr);
+      })
+      .catch((error) => {
+        res.status(500).send(`Something went wrong `, error);
       });
-      recentHitsInMemory[req.query.cityName] = cityWeatherData;
-      console.log(movieListData);
-      res.status(200).send(cityWeatherData);
-    }
-  } catch (error) {
-    res.status(500).send(`Something went wrong `, error);
   }
-};
+}
 
 // localhost:3001/cities?reqCity=amman
 // server.get("/cities", (req, res) => {
@@ -55,9 +56,9 @@ const weatherJS = async (req, res) => {
 // });
 
 class CityWeather {
-  constructor(date, desc) {
-    this.date = date;
-    this.desc = desc;
+  constructor(item) {
+    this.date = item.valid_date;
+    this.desc = item.weather.description;
   }
 }
 
